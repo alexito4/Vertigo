@@ -44,6 +44,7 @@
 - (IBAction)showImage {
     TGRImageViewController *viewController = [[TGRImageViewController alloc] initWithImage:[self.imageButton imageForState:UIControlStateNormal]];
     viewController.transitioningDelegate = self;
+    viewController.modalPresentationStyle = UIModalPresentationCustom;
     
     [self presentViewController:viewController animated:YES completion:nil];
 }

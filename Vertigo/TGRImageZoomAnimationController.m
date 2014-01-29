@@ -65,7 +65,7 @@
     [transitionContext.containerView addSubview:transitionView];
     
     // Compute the final frame for the temporary view
-    CGRect finalFrame = [transitionContext finalFrameForViewController:toViewController];
+    CGRect finalFrame = toViewController.view.frame; //[transitionContext finalFrameForViewController:toViewController];
     CGRect transitionViewFinalFrame = [self.referenceImageView.image tgr_aspectFitRectForSize:finalFrame.size];
     
     // Perform the transition using a spring motion effect
@@ -73,17 +73,22 @@
     
     self.referenceImageView.alpha = 0;
     
+    UIView *backView = [[UIView alloc] initWithFrame:fromViewController.view.frame];
+    [backView setBackgroundColor:toViewController.view.backgroundColor];
+    [backView setAlpha:0.0f];
+    [transitionContext.containerView insertSubview:backView belowSubview:transitionView];
+    
     [UIView animateWithDuration:duration
                           delay:0
          usingSpringWithDamping:0.7
           initialSpringVelocity:0
                         options:UIViewAnimationOptionCurveLinear
                      animations:^{
-                         fromViewController.view.alpha = 0;
                          transitionView.frame = transitionViewFinalFrame;
+                         [backView setAlpha:1.0f];
                      }
                      completion:^(BOOL finished) {
-                         fromViewController.view.alpha = 1;
+                         [backView removeFromSuperview];
                          
                          [transitionView removeFromSuperview];
                          [transitionContext.containerView addSubview:toViewController.view];
@@ -100,7 +105,6 @@
     
     // The toViewController view will fade in during the transition
     toViewController.view.frame = [transitionContext finalFrameForViewController:toViewController];
-    toViewController.view.alpha = 0;
     [transitionContext.containerView addSubview:toViewController.view];
     [transitionContext.containerView sendSubviewToBack:toViewController.view];
     
@@ -131,13 +135,20 @@
     // Perform the transition
     NSTimeInterval duration = [self transitionDuration:transitionContext];
     
+    UIView *backView = [[UIView alloc] initWithFrame:toViewController.view.frame];
+    [backView setBackgroundColor:fromViewController.view.backgroundColor];
+    [transitionContext.containerView insertSubview:backView belowSubview:transitionView];
+    
     [UIView animateWithDuration:duration
                           delay:0
                         options:UIViewAnimationOptionCurveEaseInOut
                      animations:^{
-                         toViewController.view.alpha = 1;
+                         [backView setAlpha:0.0f];
+                         
                          transitionView.frame = transitionViewFinalFrame;
                      } completion:^(BOOL finished) {
+                         [backView removeFromSuperview];
+                         
                          self.referenceImageView.alpha = 1;
                          [transitionView removeFromSuperview];
                          [transitionContext completeTransition:YES];
