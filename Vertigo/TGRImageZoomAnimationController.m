@@ -55,6 +55,9 @@
     TGRImageViewController *toViewController = (TGRImageViewController *)[transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     NSAssert([toViewController isKindOfClass:TGRImageViewController.class], @"*** toViewController must be a TGRImageViewController!");
     
+    CGRect screenBounds = [[UIScreen mainScreen] bounds];
+    toViewController.view.frame = screenBounds;
+    
     // Create a temporary view for the zoom in transition and set the initial frame based
     // on the reference image view
     UIImageView *transitionView = [[UIImageView alloc] initWithImage:self.referenceImageView.image];
@@ -86,6 +89,9 @@
                      animations:^{
                          transitionView.frame = transitionViewFinalFrame;
                          [backView setAlpha:1.0f];
+                         
+                         UIView *statusBarView = [[UIApplication sharedApplication] valueForKey:[@[@"status", @"Bar"] componentsJoinedByString:@""]];
+                         [statusBarView setAlpha:0.0f];
                      }
                      completion:^(BOOL finished) {
                          [backView removeFromSuperview];
@@ -146,6 +152,9 @@
                          [backView setAlpha:0.0f];
                          
                          transitionView.frame = transitionViewFinalFrame;
+                         
+                         UIView *statusBarView = [[UIApplication sharedApplication] valueForKey:[@[@"status", @"Bar"] componentsJoinedByString:@""]];
+                         [statusBarView setAlpha:1.0f];
                      } completion:^(BOOL finished) {
                          [backView removeFromSuperview];
                          
